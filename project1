@@ -1,0 +1,129 @@
+Performing my first project of ci/cd pipeline
+
+REQUIREMENT:
+   1.CODE ( provided by devloper)
+      fetching it from git hub
+           link:-https://github.com/theakash07/node-todo-cicd.git
+   we need to make it sure run the code into an environment.
+    so that it can run in all environment.
+      all types of operating system(environment)
+   2. DOCKER:
+                 docker need to conternarise the code at different differnet enviro                 it gives us a container and we can use image according to our need.
+
+   3.JENKINS
+              it's helps us to make the pipeline from getting the code from the git               to run in the container via pipeline.
+   4.AWS cloud: platform for performing this project (using ubuntu)
+
+
+SECURITY GROUP:
+         It's the most important part of this project.         
+STEP 1: INSTALL JENKINS ON THIS  SERVER MAINLY IT FETCHES THE IP ADDRESS OF THE INSTANCE TO THEN YOU CAN ACCESS THE JENKINS VIA THE IP ADDRESS AT A PARTICULAR PORT.
+
+  JENKINS WRITTEN IN JAVA THAT'S WE NEED JAVA IN OUR INSTANCE 
+  $sudo apt install openjdk-11-jre
+ 
+STEP 2: AFTER INSTALLING THE JAVA NOW WE NEED JENKINS and to install the jenkins we need the key .
+This is the Debian package repository of Jenkins to automate installation and upgrade. To use this repository, first add the key to your system:
+
+
+$  curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+STEP 5: Then add a Jenkins apt repository entry:
+$ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+STEP 4: Update your local package index, then finally install Jenkins:
+ sudo apt-get update
+  sudo apt-get install fontconfig openjdk-11-jre
+  sudo apt-get install jenkins
+STEP 5:
+ The apt packages were signed using this key:
+pub   rsa4096 2023-03-27 [SC] [expires: 2026-03-26]
+      63667EE74BBA1F0A08A698725BA31D57EF5975CA
+uid                      Jenkins Project 
+sub   rsa4096 2023-03-27 [E] [expires: 2026-03-26]
+STEP 6: FIRST ENABLE THE JENKINS 
+     $ systemctl enable jekins
+      start jenkins
+     $ systemctl start jenkins
+       check the status of wether it's running or not
+     $ systemctl status jenkins
+STEP 7:
+JENKINS RUN ON PORT 8080 SO WE NEED TO OPEN PORT 8080 USING CUSTOM TCP IN SECURITY GROUP
+AND USE IT UNDER MYIP ON INSTANCE
+STEP 8: NOW RUN COMMAND $ <YOUR INSTANCE IP>:8080
+STEP 9: YOU WILL SEE AN INTERFACE OF JENKINS THERE IS A PATH OF A FILE LIKE THIS /var/lib/jenkins/secrets/initialAdminPassword
+
+NO HIT THIS COMMAND WITH CAT COMMAND IT WILL SHOW YOU THE PASSWORD WHICH IS REQUIRED TO AUTHETICATE THE JENKINS 
+STEP 10:get into the jenkins using the credentials now go to new item .
+  make a freestyle project deploy the git url select the github project.
+   url of project source code  form git paste the url there
+if its private repo then you need give the password else if it's public then no need of password
+credentials select add jenkins
+GITHUB Need to access the server so it will do so via ssh(secured shell) after doing this ssh gives you to two key
+1.public key
+2.private key
+now need to generate keygen 
+$ssh-keygen
+this command will create a private key	but in case if you are not able to see your keys you can run this command 
+$ ls ~/.ssh/
+
+this command will let you see the keys
+STEP 10:
+now see there are two key id_rsa is private key and id_rsa.pub is public key
+so you need to connect your instance to github so you need id_rsa.pub key and go to the 
+github ssh section and tap add new sshkey
+there you need the paste the code 
+now there will be a tunnel which will let your instance communicate to the github .
+STEP11:	now you need to make a communication bridge between the instance and the jenkins 
+so you need the private key . so in the source code management go to the git section and add the private key and add the credentials
+
+now save the changes and build now in the next page
+..
+you can see the console output so far i have learned to fetch the code or making the communication bridge between the git and jenkins 
+there is fucking surge while making the bridge
+
+no if there is any installation instruction given by the devloper then proceed with it...
+
+STEP 12: AFTER BUILDING THE CODE YOU WILL GET A PATH OF DEVLOPED CODE DIRECTORY GO INTO IT INSTALL REQUIRED DEPENDENCIES INTO IT...
+      AND RUN  THE APP...
+STEP 13: Now we want it  to run on any os so we need contianer and we need to install docker for that..
+ $ sudo apt install docker.io
+
+now build using the command 
+   after installing the docker file make yaml file of docker
+after makin the file build it using the command
+$ docker build . -t node-app
+this will throw error cause docker need to be get permission user 
+$ sudo usermod -a -G docker $USER
+
+after running this command it will work..
+STEP 14:  now to run run the below command
+$ docker run -d --name <name> -p 8000:8000 <nameofile>
+-p is for port forwarding basically we mapping the port of conatainer to insance that's why we are using this command
+SO FAR CONTINOUS INTEGRATIONS IS DONE..
+
+
+STEP 14: NOW WE DO THE THINGS MANUALLY NOW WE NEED TO AUTOMATE THE THINGS...USING JENKINS
+  go to the build steps 
+put this command 
+docker build . -t <name of file>
+docker run -d --name <file> -p 8000:8000 <name of file>
+now save and build 
+it will throw error becasue jenins nedds permissions
+for that you need to run this command
+sudo usermod -a -G docker jenkins
+now then restart jenkins  running this command
+$sudo systemctl restart jenkins
+
+STEP 15: now loging again in jenkins and build it so far you have done continous integration and contionus deliver
+y
+but now you you do need to continous deploymen
+from here onwarfs you need to configure webhooks
+got to the git repo settings go to webhooks 
+add webhooks
+
+give the payload url of jenkins and add 
+now you done 
+STEP 16: NOW MAKE ANY CHANGES IT WILL WILL AUTOMATICALLY FETCH IT AND MAKE CONTAINERS FRO IT
+
