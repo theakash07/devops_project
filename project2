@@ -1,0 +1,56 @@
+hello 
+Let's Build a Live Project and serve it via NGINX.
+
+When it comes to the scalability and availability of an application, NGINX is quite an amazing tool that
+- accelerates content and application delivery
+- improves security
+- facilitates availability and scalability
+
+step:1 - Create ec2 instance with https and http accessible.
+         nginx is a webserver which serves static web files
+             reverse proxy is possible, load balancing, url redirecting , indexing and caching.
+step:2- update the instance using command #sudo apt-get update
+step:3- now install nginx in the instance using command sudo apt-get install nginx -y
+step:4 - now check wether nginx is running or not using command #systemctl status nginx
+         you can navigate with further commands like
+         sudo systemctl restart nginx 
+         sudo systemctl stop nginx
+         sudo systemctl start nginx
+step:5- now to check wether your nginx is running or not you can copy your public ip address and paste to google 
+        a page will open saying "welcome to nginx"
+step5:- nginx serves whichever html page which comes from a folder of path /var/www/html
+        cd /var/www/html 
+        localhost port number is 127.0.0.1:80
+atep:7- Now the installation file and configuration file nginx is situated at this location below 
+         #cd /etc/nginx/
+step:8- you will be able to see all the files of nginx all the configuration files but there are mainly 3 files which you need to keep in mind
+        nginx.conf , sites-available and sites-enabled .
+        you can put the configuration into the sites-available but it wont't be deployed but it will deploy in sites-enabled if you will keep it i        e sites-enabled
+step:9- now go back to /var/www/html and make a .html file with the codes and now again copy the public ip address of of instance and hit 
+        on the google . It means nginx works only on configurations of files
+step:10- following the same approach we will servae a django note app using docker so first clone the source code of the project
+         using command #git clone https://github.com/LondheShubham153/django-notes-app.git
+step:11- now install docker as per the devloper requirement to check docker status run command #docker ps
+step:12- you get an error of permission denied accessing docker so you need to give permission to user to access the docker
+         command # sudo usermod  -aG docker $USER 
+           now you need to reboot the system.
+step:13- now as per devloper command you need to build the app so run the commadn 
+         #docker buil -t  notes-app .
+         it will automatically download all the required resources and dependencies which is required to build the app.
+         we have successfully made the image using the above command now we need to make a container
+step:14- Now you need to make a container exposing port numebr 8000 to the instance 
+         run command docker run -d -p 8000:8000 notes-app:latest
+         container is successfully created now .
+          -d means detached mode which means in background mode.
+step:15-  Now using concept of reverse proxy you can access the application on your local host running the command
+           #curl -L http://127.0.0.1:8000 
+            you will be able to see the application running status now it's not accessible for the world...
+              so in order to make it accessible to world there is concept of reverse proxy 
+              so you need to go to nginx file  and in the sites-enabled file
+              and change the configuration of location and add 
+               proxy_pass http://127.0.0.1:8000
+step:16- YOU need to restart the nginx .
+          command #systemctl restart nginx 
+         copy the ip address of your instance and run it on the google search bar you wil be able to see the react app
+        and a white screen so , you need to put all the static file of the application to the /var/www/html
+           then you will be able to see the application elements instead of a white screen.
