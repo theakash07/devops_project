@@ -8,7 +8,8 @@ REQUIREMENT:
     so that it can run in all environment.
       all types of operating system(environment)
    2. DOCKER:
-                 docker need to conternarise the code at different differnet enviro                 it gives us a container and we can use image according to our need.
+                 docker need to conternarise the code at different differnet enviro 
+                 it gives us a container and we can use image according to our need.
 
    3.JENKINS
               it's helps us to make the pipeline from getting the code from the git               to run in the container via pipeline.
