@@ -1,0 +1,91 @@
+### **Notes on Today's Learnings & Solutions (Date: Dec 1, 2024)**
+
+#### **1. Issue with Docker Command in Jenkins (Permission Denied Error)**
+- **Problem:**  
+  During Jenkins build, encountered a permission denied error when Docker tried to build the image. The error message indicated an issue connecting to the Docker daemon socket (`/var/run/docker.sock`).
+  
+- **Mistake:**  
+  The Jenkins user didn't have sufficient permissions to access Docker. This issue commonly arises when the Jenkins process doesn't have access to Docker-related resources.
+  
+- **Solution:**  
+  - Added the Jenkins user to the Docker group using:  
+    ```
+    sudo usermod -aG docker jenkins
+    ```
+  - Restarted Jenkins for the group changes to take effect.
+
+---
+
+#### **2. Git SSH Host Key Verification Warning in Jenkins**
+- **Problem:**  
+  While fetching the Git repository from GitHub, Jenkins showed a warning related to the known hosts file for SSH verification.
+  
+- **Mistake:**  
+  The known_hosts file was missing or not properly configured in Jenkins.
+  
+- **Solution:**  
+  - In Jenkins, went to **Manage Jenkins** → **Security** → **Git Host Key Verification Configuration** and configured the known_hosts file.
+  - After this configuration, the warning was resolved, and Jenkins was able to connect to the GitHub repository without issues.
+
+---
+
+#### **3. Docker Container Name Confusion and Image Management**
+- **Problem:**  
+  The issue arose when trying to use a container named `webcontainer`, but the command was trying to remove a running container (`docker rm webcontainer`), resulting in errors. Additionally, there was confusion about the image name (`webcontainer:latest`).
+  
+- **Mistake:**  
+  The container name was incorrectly referenced in the `docker run` command as `webcontainer`, which was not the name of the image.
+  
+- **Solution:**  
+  - Corrected the `docker run` command to use the correct image name `staticwebapp` instead of `webcontainer`.
+  - Stopped the existing container and forcefully removed it if necessary:
+    ```
+    docker stop webcontainer
+    docker rm webcontainer
+    ```
+  - Ensured the `docker run` command correctly referenced the image and the container was started:
+    ```
+    docker run -d -p 80:80 --name staticwebsite staticwebapp
+    ```
+
+---
+
+#### **4. Issue with Port Binding in Docker (Port 80 Already in Use)**
+- **Problem:**  
+  The error occurred when Docker tried to bind port 80 to the container, but port 80 was already in use by another service on the system.
+
+- **Mistake:**  
+  The mistake was not checking for other services that may be using port 80 (e.g., Nginx or Apache running on the host machine).
+  
+- **Solution:**  
+  - Checked the processes using port 80 using:
+    ```
+    sudo lsof -i :80
+    ```
+  - Stopped the conflicting service (e.g., Nginx or Apache) if running:
+    ```
+    sudo systemctl stop nginx
+    sudo systemctl stop apache2
+    ```
+  - After freeing up port 80, successfully ran the Docker container.
+
+---
+
+#### **5. Dockerfile Explanation and Usage**
+- **Explanation:**  
+  - The `Dockerfile` provided defines the steps to build a Docker image for serving a static website using Nginx:
+    1. **FROM nginx:latest:** Uses the latest official Nginx image as the base.
+    2. **COPY . /usr/share/nginx/html:** Copies all the files from the current directory (which contains the static website) into the Nginx default HTML directory.
+    3. **EXPOSE 80:** Exposes port 80 so that Nginx can serve the website on this port.
+    - This configuration is correct for serving a simple static website using Nginx inside a Docker container.
+  
+---
+
+### **Key Takeaways:**
+- **Permission Issues:** Docker daemon permissions for Jenkins can be fixed by adding Jenkins to the Docker group and restarting Jenkins.
+- **Container and Image Management:** Make sure to reference the correct container and image names in Docker commands. Understand the difference between images and containers.
+- **Port Binding Conflicts:** Before running a Docker container, ensure no other services are using the same ports, especially for common ports like 80 and 443.
+
+---
+
+These notes should help you remember the important steps and solutions for handling similar issues in the future. Feel free to refer to them as a guide! 😊
